@@ -29,7 +29,7 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
   implicit val timeout: Timeout                                  = 3.seconds
   implicit val scheduler: org.apache.pekko.actor.typed.Scheduler = context.system.scheduler
 
-  val registeredProcessors: ListBuffer[BaseProcessor] = ListBuffer.empty
+  private val registeredProcessors: ListBuffer[BaseProcessor] = ListBuffer.empty
 
   override def onMessage(msg: Any): Behavior[Any] = {
     msg match {
