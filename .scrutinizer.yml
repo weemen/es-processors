@@ -1,0 +1,18 @@
+build:
+  environment:
+    scala: "3.5.1"  # or latest 3.x version
+
+dependencies:
+  pre:
+    - sbt update
+
+tests:
+  override:
+    - sbt scalastyle   # Run static analysis
+    - sbt test         # Run tests (if configured)
+
+checks:
+  scala:
+    # Enable specific checks
+    duplication: true
+    style_violations: true
