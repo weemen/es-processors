@@ -1,6 +1,6 @@
 build:
   environment:
-    scala: "3.5.1"  # or latest 3.x version
+    scala: "3.8.1"  # or latest 3.x version
 
 dependencies:
   pre:
