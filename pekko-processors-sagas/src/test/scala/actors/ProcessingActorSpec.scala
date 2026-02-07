@@ -10,7 +10,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import scala.concurrent.duration.*
 
 class MockProcessingProcessor(listOfEvents: List[Any]) extends BaseProcessor(listOfEvents) {
-  var processCalledCount = 0
+  var processCalledCount              = 0
   override def process(): Option[Any] = {
     processCalledCount += 1
     for {
@@ -28,19 +28,19 @@ class ProcessingActorSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike
 
     "register events and call process on every message" in {
       val processor = new MockProcessingProcessor(List(TestEventA, TestEventB))
-      val actor = spawn(ProcessingActor("test-actor-1", processor))
-      
+      val actor     = spawn(ProcessingActor("test-actor-1", processor))
+
       val eventA = TestEventA("A")
       actor ! eventA
-      
+
       eventually {
         processor.getEventByType[TestEventA] shouldBe Some(eventA)
         processor.processCalledCount shouldBe 1
       }
-      
+
       val eventB = TestEventB(2)
       actor ! eventB
-      
+
       eventually {
         processor.getEventByType[TestEventB] shouldBe Some(eventB)
         processor.processCalledCount shouldBe 2
@@ -49,10 +49,10 @@ class ProcessingActorSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike
 
     "not register events not in the list" in {
       val processor = new MockProcessingProcessor(List(TestEventA))
-      val actor = spawn(ProcessingActor("test-actor-2", processor))
-      
+      val actor     = spawn(ProcessingActor("test-actor-2", processor))
+
       actor ! TestEventB(2)
-      
+
       eventually {
         processor.getEventByType[TestEventB] shouldBe None
         processor.processCalledCount shouldBe 1

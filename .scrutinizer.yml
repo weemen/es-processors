@@ -8,11 +8,16 @@ dependencies:
 
 tests:
   override:
-    - sbt scalastyle   # Run static analysis
-    - sbt test         # Run tests (if configured)
+    - sbt "scalafmtCheckAll"
+#    - sbt coverage test
+#    - coverage: 'target/scala-3.8.1/scoverage-report/scoverage.xml'
 
 checks:
   scala:
-    # Enable specific checks
     duplication: true
-    style_violations: true
+    style_violations: true  # Uses scalafmt reports
+
+tools:
+  # Scala 3 prefers scalafmt over scalastyle
+  scalafmt:
+    enabled: true

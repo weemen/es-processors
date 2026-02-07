@@ -14,7 +14,7 @@ abstract class BaseProcessor(val listOfEvents: List[Any]):
     if (name.endsWith("$")) name.init else name
 
   def registerEvent[A](event: A): Unit =
-    val eventName = event.getClass.getSimpleName
+    val eventName          = event.getClass.getSimpleName
     val requiredEventNames = listOfEvents.map(getClassName)
     if (requiredEventNames.contains(eventName) && !registeredEvents.exists(_.getClass.getSimpleName == eventName)) {
       registeredEvents += event

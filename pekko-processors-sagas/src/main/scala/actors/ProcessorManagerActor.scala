@@ -89,7 +89,7 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
   ): ActorRef[Any] = {
     context.child(actorId) match {
       case Some(ref) => ref.asInstanceOf[ActorRef[Any]]
-      case None =>
+      case None      =>
         getActorByActorId(system, actorId).getOrElse {
           context.log.info(s"Actor with ID: $actorId not found, spawning new one.")
           spawnActorForBaseProcessor(system, actorId, processor)
@@ -106,7 +106,7 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
     // The previous implementation tried to use SpawnProtocol on the system, which is only needed if spawning from outside.
     context.child(actorId) match {
       case Some(ref) => ref.asInstanceOf[ActorRef[Any]]
-      case None => context.spawn(ProcessingActor(actorId, processor), actorId)
+      case None      => context.spawn(ProcessingActor(actorId, processor), actorId)
     }
   }
 }
