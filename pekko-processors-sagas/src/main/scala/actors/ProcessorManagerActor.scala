@@ -19,11 +19,11 @@ object ProcessorManagerActor {
     Behaviors.setup[Any] { context =>
       val serviceKey = ServiceKey[Any](s"manager-$actorId")
       context.system.receptionist ! Receptionist.Register(serviceKey, context.self)
-      new ProcessorManagerActor(context, actorId)
+      new ProcessorManagerActor(actorId)(using context)
     }
 }
 
-class ProcessorManagerActor(context: ActorContext[Any], actorId: String) extends AbstractBehavior[Any](context) {
+class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) extends AbstractBehavior[Any](context) {
   context.log.info(s"ProcessorManagerActor for started with actorId: $actorId")
 
   implicit val timeout: Timeout                                  = 3.seconds

@@ -10,11 +10,11 @@ object ProcessingActor {
     Behaviors.setup[Any] { context =>
       val serviceKey = ServiceKey[Any](s"worker-$actorId")
       context.system.receptionist ! Receptionist.Register(serviceKey, context.self)
-      new ProcessingActor(context, actorId, processorType)
+      new ProcessingActor(actorId, processorType)(using context)
     }
 }
 
-class ProcessingActor(context: ActorContext[Any], actorId: String, processorType: BaseProcessor)
+class ProcessingActor(actorId: String, processorType: BaseProcessor)(using context: ActorContext[Any])
     extends AbstractBehavior[Any](context) {
   context.log.info(s"ProcessorActor for ${processorType.getClass.getSimpleName} started with actorId: $actorId")
 
