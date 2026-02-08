@@ -1,23 +1,24 @@
 build:
-  environment:
-    scala: "3.8.1"  # or latest 3.x version
-
-dependencies:
-  pre:
-    - sbt update
-
-tests:
-  override:
-    - sbt "scalafmtCheckAll"
-#    - sbt coverage test
-#    - coverage: 'target/scala-3.8.1/scoverage-report/scoverage.xml'
+  nodes:
+    analysis:
+      environment:
+        java: "21.0.5"
+      dependencies:
+        override:
+          - sbt "project pekko-processors-sagas" update
+      tests:
+        override:
+          - command: sbt "project pekko-processors-sagas" "scalafmtCheckAll"
+          - command: sbt "project pekko-processors-sagas" coverage test coverageReport
+            coverage:
+              file: 'pekko-processors-sagas/target/scala-3.8.1/scoverage-report/scoverage.xml'
+              format: 'scoverage-xml'
 
 checks:
   scala:
     duplication: true
-    style_violations: true  # Uses scalafmt reports
+    style_violations: true
 
 tools:
-  # Scala 3 prefers scalafmt over scalastyle
   scalafmt:
     enabled: true
