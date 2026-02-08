@@ -13,12 +13,3 @@ build:
             coverage:
               file: 'pekko-processors-sagas/target/scala-3.8.1/scoverage-report/scoverage.xml'
               format: 'scoverage-xml'
-
-checks:
-  scala:
-    duplication: true
-    style_violations: true
-
-tools:
-  scalafmt:
-    enabled: true
