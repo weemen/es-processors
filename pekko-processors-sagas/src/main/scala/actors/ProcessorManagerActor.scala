@@ -7,12 +7,14 @@ import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.util.Timeout
 import processors.BaseProcessor
 
+trait CborSerializable
+
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
 import scala.concurrent.duration.*
 
-final case class RegisterProcessor(processor: BaseProcessor)
-final case class ProcessEvent[A](event: A, identifier: String)
+final case class RegisterProcessor(processor: BaseProcessor) extends CborSerializable
+final case class ProcessEvent[A](event: A, identifier: String) extends CborSerializable
 
 object ProcessorManagerActor {
   def apply(actorId: String): Behavior[Any] =

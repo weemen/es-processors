@@ -1,9 +1,10 @@
 package processors
+import actors.CborSerializable
 import scala.collection.mutable.ListBuffer
 
 import scala.reflect.ClassTag
 
-abstract class BaseProcessor(val listOfEvents: List[Any]):
+abstract class BaseProcessor(val listOfEvents: List[Any]) extends CborSerializable:
   protected val registeredEvents: ListBuffer[Any] = ListBuffer.empty
 
   private def getClassName(obj: Any): String =
