@@ -1,6 +1,6 @@
 package actors
 
-import org.apache.pekko.actor.typed.{Behavior, PostStop, Signal}
+import org.apache.pekko.actor.typed.{Behavior, PostStop, Signal, PreRestart}
 import org.apache.pekko.actor.typed.receptionist.{Receptionist, ServiceKey}
 import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import processors.BaseProcessor
@@ -16,20 +16,25 @@ object ProcessingActor {
 
 class ProcessingActor(actorId: String, processorType: BaseProcessor)(using context: ActorContext[Any])
     extends AbstractBehavior[Any](context) {
-  context.log.info(s"ProcessorActor for ${processorType.getClass.getSimpleName} started with actorId: $actorId")
+  context.log.info(s"ProcessorActor for ${processorType.getClass.getSimpleName} (re)started with actorId: $actorId")
 
   override def onMessage(msg: Any): Behavior[Any] = {
     processorType.registerEvent(msg)
     val result: Option[Any] = processorType.process()
     result match {
-      case Some(event) => context.log.info(s"Yielded event: $event")
+      case Some(event) =>
+        context.log.info(s"Yielded event: $event")
       case None        => context.log.info(s"No event yielded")
     }
     this
   }
 
-  override def onSignal: PartialFunction[Signal, Behavior[Any]] = { case PostStop =>
-    context.log.info(s"ProcessorActor with actorId: ${actorId} stopped")
-    this
+  override def onSignal: PartialFunction[Signal, Behavior[Any]] = {
+    case PostStop =>
+      context.log.info(s"ProcessorActor with actorId: ${actorId} stopped")
+      this
+    case PreRestart =>
+      context.log.info(s"ProcessorActor with actorId: ${actorId} is about to restart")
+      this
   }
 }
