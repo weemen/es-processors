@@ -12,9 +12,11 @@ import scala.concurrent.duration.*
 
 class ClusterProcessingSpec extends AnyWordSpec with Matchers with Eventually {
 
-  def config(port: Int) = ConfigFactory.parseString(s"""
+  def config(port: Int) = ConfigFactory
+    .parseString(s"""
       |pekko.remote.artery.canonical.port = $port
-      |""".stripMargin).withFallback(ConfigFactory.load("cluster-test.conf"))
+      |""".stripMargin)
+    .withFallback(ConfigFactory.load("cluster-test.conf"))
 
   "Processing system in a cluster" should {
     "reach ProcessingActor on a different node" in {

@@ -9,6 +9,5 @@ enum StorageConfig:
 final case class ProcessorActorConfig(strategy: String, config: StorageConfig)
 
 object ProcessorActorConfig:
-  val strategy: Reader[ProcessorActorConfig, String] = Reader(_.strategy)
+  val strategy: Reader[ProcessorActorConfig, String]      = Reader(_.strategy)
   val config: Reader[ProcessorActorConfig, StorageConfig] = Reader(_.config)
-

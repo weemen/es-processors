@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
 import scala.concurrent.duration.*
 
-final case class RegisterProcessor(processor: BaseProcessor) extends CborSerializable
+final case class RegisterProcessor(processor: BaseProcessor)   extends CborSerializable
 final case class ProcessEvent[A](event: A, identifier: String) extends CborSerializable
 
 object ProcessorManagerActor {
@@ -35,7 +35,6 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
 
   private val registeredProcessors: ListBuffer[BaseProcessor] = ListBuffer.empty
 
-
   override def onMessage(msg: Any): Behavior[Any] = {
     msg match {
       case processor: RegisterProcessor    =>
@@ -50,10 +49,9 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
     this
   }
 
-  override def onSignal: PartialFunction[Signal, Behavior[Any]] = {
-    case PostStop =>
-      context.log.info(s"ProcessorManagerActor with actorId: ${actorId} stopped")
-      this
+  override def onSignal: PartialFunction[Signal, Behavior[Any]] = { case PostStop =>
+    context.log.info(s"ProcessorManagerActor with actorId: ${actorId} stopped")
+    this
   }
 
   private def getClassName(obj: Any): String = {

@@ -5,8 +5,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import org.apache.pekko.actor.typed.ActorRef
 
-case class TestEventA(value: String) extends CborSerializable
-case class TestEventB(value: Int) extends CborSerializable
+case class TestEventA(value: String)  extends CborSerializable
+case class TestEventB(value: Int)     extends CborSerializable
 case class TestEventC(value: Boolean) extends CborSerializable
 
 class MockProcessor(listOfEvents: List[Any]) extends BaseProcessor(listOfEvents) {
