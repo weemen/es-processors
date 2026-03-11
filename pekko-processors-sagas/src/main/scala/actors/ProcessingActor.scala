@@ -15,22 +15,25 @@ object ProcessingActor {
       context.system.receptionist ! Receptionist.Register(serviceKey, context.self)
 
       // the config needs to be here.
-      val config = ConfigFactory.load()
+      val config   = ConfigFactory.load()
       val strategy = config.getConfig("es-processors-sagas.recovery.strategy").getString("type")
 
       val recovery = strategy match {
         case "local" =>
           LocalRecovery(
-            StorageConfig.Local(config.getConfig("es-processors-sagas.recovery.strategy.local").getString("storage_path"))
+            StorageConfig.Local(
+              config.getConfig("es-processors-sagas.recovery.strategy.local").getString("storage_path")
+            )
           )
-        case _ => throw new Exception("Strategy not supported")
+        case _       => throw new Exception("Strategy not supported")
       }
       new ProcessingActor(actorId, processorType, recovery: Recovery)(using context)
     }
 }
 
-class ProcessingActor(actorId: String, processorType: BaseProcessor, recovery: Recovery)(using context: ActorContext[Any])
-    extends AbstractBehavior[Any](context) {
+class ProcessingActor(actorId: String, processorType: BaseProcessor, recovery: Recovery)(using
+    context: ActorContext[Any]
+) extends AbstractBehavior[Any](context) {
   context.log.info(s"ProcessorActor for ${processorType.getClass.getSimpleName} (re)started with actorId: $actorId")
 
   override def onMessage(msg: Any): Behavior[Any] = {
@@ -45,14 +48,14 @@ class ProcessingActor(actorId: String, processorType: BaseProcessor, recovery: R
             recovery.delete(actorId = actorId)
           case None        => context.log.info(s"No event yielded")
         }
-      case _ =>
+      case _                       =>
         context.log.debug(s"Received message that is not CborSerializable: $msg")
     }
     this
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[Any]] = {
-    case PostStop =>
+    case PostStop   =>
       context.log.info(s"ProcessorActor with actorId: ${actorId} stopped")
       this
     case PreRestart =>
