@@ -6,7 +6,7 @@ import org.apache.pekko.actor.typed.{Behavior, PostStop, PreRestart, Signal}
 import org.apache.pekko.actor.typed.receptionist.{Receptionist, ServiceKey}
 import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import processors.BaseProcessor
-import storage.{LocalRecovery, Recovery}
+import storage.{LocalRecovery, RedisRecovery, Recovery}
 
 object ProcessingActor {
   def apply(actorId: String, processorType: BaseProcessor): Behavior[Any] =
@@ -23,6 +23,16 @@ object ProcessingActor {
           LocalRecovery(
             StorageConfig.Local(
               config.getConfig("es-processors-sagas.recovery.strategy.local").getString("storage_path")
+            )
+          )
+        case "redis" =>
+          val redisConfig = config.getConfig("es-processors-sagas.recovery.strategy.redis")
+          RedisRecovery(
+            StorageConfig.Redis(
+              username = redisConfig.getString("username"),
+              password = redisConfig.getString("password"),
+              host = redisConfig.getString("host"),
+              port = redisConfig.getInt("port")
             )
           )
         case _       => throw new Exception("Strategy not supported")

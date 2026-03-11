@@ -17,7 +17,8 @@ lazy val `pekko-processors-sagas` = (project in file("pekko-processors-sagas"))
       "org.apache.pekko" %% "pekko-testkit"               % "1.1.2"  % Test,
       "org.apache.pekko" %% "pekko-actor-testkit-typed"   % "1.1.2"  % Test,
       "org.scalatest"    %% "scalatest"                 % "3.2.19" % Test,
-      "org.typelevel"    %% "cats-core"         % "2.13.0"
+      "org.typelevel"    %% "cats-core"         % "2.13.0",
+      "redis.clients"     % "jedis"             % "5.1.0"
     )
   )
 
