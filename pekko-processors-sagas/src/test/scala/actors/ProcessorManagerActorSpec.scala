@@ -9,7 +9,7 @@ import scala.concurrent.duration.*
 import org.apache.pekko.actor.typed.{Behavior, SpawnProtocol}
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 
-class MockManagerProcessor(val name: String, listOfEvents: List[Any]) extends BaseProcessor(listOfEvents) {
+class DummyProcessor(val name: String, listOfEvents: List[Any]) extends BaseProcessor(listOfEvents) {
   var lastRegisteredEvent: Option[Any]          = None
   override def registerEvent[A](event: A): Unit = {
     lastRegisteredEvent = Some(event)
@@ -27,14 +27,14 @@ class ProcessorManagerActorSpec extends ScalaTestWithActorTestKit with AnyWordSp
 
     "register a processor" in {
       val manager   = spawn(ProcessorManagerActor("manager-1"))
-      val processor = new MockManagerProcessor("p1", List(TestEventA))
+      val processor = new DummyProcessor("p1", List(TestEventA))
 
       manager ! RegisterProcessor(processor)
     }
 
     "broadcast events to registered processors" in {
       val manager   = spawn(ProcessorManagerActor("manager-2"))
-      val processor = new MockManagerProcessor("p2", List(TestEventA))
+      val processor = new DummyProcessor("p2", List(TestEventA))
 
       manager ! RegisterProcessor(processor)
 
@@ -48,7 +48,7 @@ class ProcessorManagerActorSpec extends ScalaTestWithActorTestKit with AnyWordSp
 
     "not broadcast events to processors that don't need them" in {
       val manager   = spawn(ProcessorManagerActor("manager-3"))
-      val processor = new MockManagerProcessor("p3", List(TestEventA))
+      val processor = new DummyProcessor("p3", List(TestEventA))
 
       manager ! RegisterProcessor(processor)
 
@@ -65,8 +65,8 @@ class ProcessorManagerActorSpec extends ScalaTestWithActorTestKit with AnyWordSp
         ctx.log.info("Starting isolated manager for multi-processor test")
         ProcessorManagerActor("manager-4")
       })
-      val processor1 = new MockManagerProcessor("multi-p1", List(TestEventA))
-      val processor2 = new MockManagerProcessor("multi-p2", List(TestEventB))
+      val processor1 = new DummyProcessor("multi-p1", List(TestEventA))
+      val processor2 = new DummyProcessor("multi-p2", List(TestEventB))
 
       manager ! RegisterProcessor(processor1)
       manager ! RegisterProcessor(processor2)

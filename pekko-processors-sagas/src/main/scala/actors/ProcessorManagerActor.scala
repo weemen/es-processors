@@ -1,11 +1,14 @@
 package actors
 
+import com.typesafe.config.ConfigFactory
+import config.StorageConfig
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Behavior, PostStop, Props, Signal, SpawnProtocol}
 import org.apache.pekko.actor.typed.receptionist.{Receptionist, ServiceKey}
 import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.util.Timeout
 import processors.BaseProcessor
+import storage.{LocalRecovery, Recovery}
 
 trait CborSerializable
 
@@ -26,12 +29,12 @@ object ProcessorManagerActor {
 }
 
 class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) extends AbstractBehavior[Any](context) {
-  context.log.info(s"ProcessorManagerActor for started with actorId: $actorId")
 
   implicit val timeout: Timeout                                  = 3.seconds
   implicit val scheduler: org.apache.pekko.actor.typed.Scheduler = context.system.scheduler
 
   private val registeredProcessors: ListBuffer[BaseProcessor] = ListBuffer.empty
+
 
   override def onMessage(msg: Any): Behavior[Any] = {
     msg match {
@@ -40,15 +43,17 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
           s"[ProcessorManagerActor] Registering processor: ${processor.processor.getClass.getSimpleName}"
         )
         registeredProcessors.addOne(processor.processor)
-      case ProcessEvent(event, identifier) => broadcastEvent(event, identifier)
+      case ProcessEvent(event, identifier) =>
+        broadcastEvent(event, identifier)
       case _                               => context.log.info(s"[ProcessorManagerActor] I cannot handler this message: ${msg.toString}")
     }
     this
   }
 
-  override def onSignal: PartialFunction[Signal, Behavior[Any]] = { case PostStop =>
-    context.log.info(s"ProcessorManagerActor with actorId: ${actorId} stopped")
-    this
+  override def onSignal: PartialFunction[Signal, Behavior[Any]] = {
+    case PostStop =>
+      context.log.info(s"ProcessorManagerActor with actorId: ${actorId} stopped")
+      this
   }
 
   private def getClassName(obj: Any): String = {
@@ -64,15 +69,11 @@ class ProcessorManagerActor(actorId: String)(using context: ActorContext[Any]) e
     registeredProcessors.foreach(processor => {
       val requiredEventNames = processor.listOfEvents.map(getClassName)
       if (requiredEventNames.contains(msgInstanceType)) {
-        sendEventToProcessor(event, identifier, processor)
+        getOrCreateActor(context.system, identifier, processor).tell(event)
       } else {
         context.log.info(s"Event $msgInstanceType not found in ${processor.getClass.getSimpleName}")
       }
     })
-  }
-
-  private def sendEventToProcessor(event: Any, identifier: String, processor: BaseProcessor): Unit = {
-    getOrCreateActor(context.system, identifier, processor).tell(event)
   }
 
   def getActorByActorId(system: ActorSystem[?], actorId: String)(implicit
