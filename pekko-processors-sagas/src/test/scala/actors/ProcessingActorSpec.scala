@@ -1,5 +1,6 @@
 package actors
 
+import org.apache.pekko.Done
 import org.apache.pekko.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.matchers.should.Matchers
@@ -7,16 +8,17 @@ import org.scalatest.concurrent.Eventually
 import processors.{BaseProcessor, TestEventA, TestEventB}
 import org.apache.pekko.actor.typed.Behavior
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
+
 import scala.concurrent.duration.*
 
 class MockProcessingProcessor(listOfEvents: List[Any]) extends BaseProcessor(listOfEvents) {
-  var processCalledCount              = 0
-  override def process(): Option[Any] = {
+  var processCalledCount               = 0
+  override def process(): Option[Done] = {
     processCalledCount += 1
     for {
       a <- getEventByType[TestEventA]
       b <- getEventByType[TestEventB]
-    } yield s"Processed-${a.value}-${b.value}"
+    } yield Done
   }
 }
 

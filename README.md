@@ -6,6 +6,7 @@ The processors are designed to be lightweight, flexible, and easy to integrate i
 ```scala
 import org.apache.pekko.actor.typed.{ActorRef, ActorSystem, Props, SpawnProtocol}
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.Done
 import org.apache.pekko.util.Timeout
 import processors.BaseProcessor
 import actors.{ProcessorManagerActor, RegisterProcessor, ProcessEvent, CborSerializable}
@@ -20,11 +21,12 @@ final case class DomainEventC(myPropertyC: String, myPropertyD: Int) extends Cbo
 
 class SomeProcessorType(listOfEvents: List[Any]) extends BaseProcessor(listOfEvents):
 
-def process(): Option[DomainEventC] = {
+def process(): Option[Done] = {
   for
     eventA <- getEventByType[DomainEventA]
     eventB <- getEventByType[DomainEventB]
-  yield DomainEventC(myPropertyC = "C", myPropertyD = eventA.myPropertyB + eventB.myPropertyY)
+    // Do something with eventA and eventB here
+  yield Done
 }
 
 @main

@@ -37,9 +37,9 @@ class LocalRecovery(config: StorageConfig.Local) extends Recovery {
     while (new File(s"${config.storagePath}/$actorId-$eventNumber.bin").exists()) {
       eventNumber += 1
     }
-    val fileName = s"${config.storagePath}/$actorId-$eventNumber.bin"
+    val fileName    = s"${config.storagePath}/$actorId-$eventNumber.bin"
     logger.info(s"[LocalRecovery] Saving event for actorId: $actorId to file: $fileName")
-    val oos      = new ObjectOutputStream(new FileOutputStream(fileName))
+    val oos         = new ObjectOutputStream(new FileOutputStream(fileName))
     oos.writeObject(event)
     oos.close()
   }

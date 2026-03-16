@@ -1,7 +1,8 @@
 package processors
 import actors.CborSerializable
-import scala.collection.mutable.ListBuffer
+import org.apache.pekko.Done
 
+import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
 
 abstract class BaseProcessor(val listOfEvents: List[Any]) extends CborSerializable:
@@ -24,4 +25,4 @@ abstract class BaseProcessor(val listOfEvents: List[Any]) extends CborSerializab
   def getEventByType[T](using ct: ClassTag[T]): Option[T] =
     registeredEvents.collectFirst { case e: T => e }
 
-  def process(): Option[Any]
+  def process(): Option[Done]

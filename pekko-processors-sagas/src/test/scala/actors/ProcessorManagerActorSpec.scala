@@ -1,10 +1,12 @@
 package actors
 
+import org.apache.pekko.Done
 import org.apache.pekko.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.Eventually
 import processors.{BaseProcessor, TestEventA, TestEventB}
+
 import scala.concurrent.duration.*
 import org.apache.pekko.actor.typed.{Behavior, SpawnProtocol}
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
@@ -15,7 +17,7 @@ class DummyProcessor(val name: String, listOfEvents: List[Any]) extends BaseProc
     lastRegisteredEvent = Some(event)
     super.registerEvent(event)
   }
-  override def process(): Option[Any]           = None
+  override def process(): Option[Done]          = None
   override def toString: String                 = s"MockManagerProcessor($name)"
 }
 

@@ -1,6 +1,7 @@
 package processors
 
 import actors.CborSerializable
+import org.apache.pekko.Done
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import org.apache.pekko.actor.typed.ActorRef
@@ -10,11 +11,11 @@ case class TestEventB(value: Int)     extends CborSerializable
 case class TestEventC(value: Boolean) extends CborSerializable
 
 class MockProcessor(listOfEvents: List[Any]) extends BaseProcessor(listOfEvents) {
-  override def process(): Option[Any] = {
+  override def process(): Option[Done] = {
     for {
       a <- getEventByType[TestEventA]
       b <- getEventByType[TestEventB]
-    } yield s"${a.value}-${b.value}"
+    } yield Done
   }
 }
 
@@ -66,7 +67,7 @@ class BaseProcessorSpec extends AnyWordSpec with Matchers {
       processor.registerEvent(TestEventA("hello"))
       processor.registerEvent(TestEventB(100))
 
-      processor.process() shouldBe Some("hello-100")
+      processor.process() shouldBe Some(Done)
     }
 
     "return None when process is called but events are missing" in {
